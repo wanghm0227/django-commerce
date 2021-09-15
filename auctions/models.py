@@ -5,7 +5,6 @@ from django.db import models
 from django.db.models.deletion import CASCADE
 from djmoney.models.fields import MoneyField
 from djmoney.models.validators import MinMoneyValidator
-from ckeditor.fields import RichTextField
 
 
 class User(AbstractUser):
@@ -16,7 +15,7 @@ class Lot(models.Model):
     seller = models.ForeignKey(
         User, on_delete=CASCADE, related_name="lots")
     title = models.CharField(max_length=64)
-    description = RichTextField()
+    description = models.TextField()
     bid = MoneyField(max_digits=10, decimal_places=2,
                      default_currency='USD', validators=[
                          MinMoneyValidator(Decimal('0.01')),
@@ -28,3 +27,18 @@ class Lot(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return '/listings/%i/' % self.id
+
+
+class Bid(models.Model):
+    price = MoneyField(max_digits=10, decimal_places=2,
+                       default_currency='USD', validators=[
+                           MinMoneyValidator(Decimal('0.01')),
+                       ])
+    lot = models.ForeignKey(Lot, on_delete=CASCADE, related_name="bids")
+    bidder = models.ForeignKey(User, on_delete=CASCADE, related_name="bids")
+
+
+    def __str__(self):
+        return f'{self.price} - {self.lot} - {self.bidder}'

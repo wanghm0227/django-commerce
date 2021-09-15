@@ -2,33 +2,62 @@
 {% load static %}
 
 {% block body %}
+{% if messages %}
+<div class="messages">
+  {% for message in messages %}
+  <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
 <h4>{{ lot.title }}</h4>
 <small>Listed by: {{ lot.seller }}</small><br>
-<small>Category: No Category Listed</small><br>
+<small>Category: <a href="{% url 'category_listings' lot.category %}">{{ lot.category }}</a></small><br>
 <hr>
 <img class="lot-img"
   src="{% if lot.image %}{{ lot.image.url }}{% else %}{% static 'auctions/images/lot_default_pic.png' %}{% endif %}"
   alt="Lot's picture">
 <br><br>
 <p>{{ lot.description|safe }}</p>
+{% if user == lot.seller %}
+<h5>Price:
+  {% if highest_bid %}
+  {{ highest_bid.price }}
+  {% else %}
+  {{ lot.bid }}
+  {% endif %}
+</h5>
+{{ lot.bids.count }} bids so far.
+<br>
+<br>
+<a href="{% url 'update_lot' lot.pk %}" class="btn btn-primary">Modify</a>
+<a href="{% url 'delete_lot' lot.pk %}" class="btn btn-primary">Delete</a>
+{% else %}
 <hr>
-<h5>Price: {{ lot.bid }}</h5>
-<small>2 bids so far. Your bid is the current bid.</small>
-<form action="{% url 'place_bid' lot.pk %}">
+<h5>Price:
+  {% if highest_bid %}
+  {{ highest_bid.price }}
+  {% else %}
+  {{ lot.bid }}
+  {% endif %}
+</h5>
+<small>
+  {{ lot.bids.count }} bids so far.
+  {% if highest_bid.bidder == request.user %}
+  Your bid is the current bid.
+  {% endif %}
+
+</small>
+<form action="{% url 'place_bid' lot.pk %}" method="post">
+  {% csrf_token %}
   <div class="row g-3 align-items-center">
     <div class="col-auto">
-      <input type="number" class="form-control" placeholder="Bid">
+      <input name="offer" type="number" class="form-control" placeholder="Bid" required step="0.01">
     </div>
     <div class="col-auto">
-      <input type="button" value="Place Bid" class="btn btn-primary">
+      <input type="submit" value="Place Bid" class="btn btn-primary">
     </div>
   </div>
 </form>
-{% if messages %}
-<ul class="messages">
-  {% for message in messages %}
-  <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
 {% endif %}
+
 {% endblock body %}

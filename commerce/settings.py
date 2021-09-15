@@ -33,15 +33,15 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'auctions',
-    'djmoney',
-    'ckeditor',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'auctions',
+    'djmoney',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [

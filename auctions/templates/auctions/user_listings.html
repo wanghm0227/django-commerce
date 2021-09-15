@@ -2,6 +2,11 @@
 {% load static %}
 
 {% block body %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-primary">{{ message }}</div>
+{% endfor %}
+{% endif %}
 {% if not object_list %}
 Don't have a listing yet, <a href="{% url 'create_listing' %}">create one?</a>
 {% else %}
@@ -20,8 +25,7 @@ Don't have a listing yet, <a href="{% url 'create_listing' %}">create one?</a>
         <p class="card-text">
           <strong>{{ lot.bid }}</strong>
         </p>
-        <a href="{% url 'update_lot' lot.pk %}" class="btn btn-primary">Update</a>
-        <a href="{% url 'delete_lot' lot.pk %}" class="btn btn-primary">Delete</a>
+        <a href="{% url 'lot_detail' lot.pk %}" class="btn btn-primary">More</a>
       </div>
       <div class="card-footer">
         <small class="text-muted">Created {{ lot.add_date }}</small>
@@ -34,4 +38,6 @@ Don't have a listing yet, <a href="{% url 'create_listing' %}">create one?</a>
 
   {% endblock %}
 
-  Lorem, ipsum dolor sit amet consectetur adipisicing elit. Odit delectus aperiam similique excepturi. Quam fugit, minus, numquam temporibus asperiores voluptatem odit dolorum cupiditate, hic ea maiores? Veritatis magni vero laboriosam!
+  Lorem, ipsum dolor sit amet consectetur adipisicing elit. Odit delectus aperiam similique excepturi. Quam fugit,
+  minus, numquam temporibus asperiores voluptatem odit dolorum cupiditate, hic ea maiores? Veritatis magni vero
+  laboriosam!

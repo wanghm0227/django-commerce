@@ -2,12 +2,16 @@
 {% load static %}
 
 {% block body %}
-{% if user.is_authenticated and request.user.id == user.id %}
+{% if user.is_authenticated%}
+{% if lot.seller == user %}
 <form method="POST">
   {% csrf_token %}
   <p> <strong>Are you sure you want to delete "{{ lot }}"?</strong> </p>
   <input type="submit" value="Confirm" class="btn btn-primary btn-sm" />
 </form>
+{% else %}
+Sorry, you can't do that.
+{% endif %}
 {% else %}
 Sorry, you need to <a href="{% url 'login' %}">Log In</a>.
 {% endif %}

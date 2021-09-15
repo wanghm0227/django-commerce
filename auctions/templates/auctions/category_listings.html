@@ -1,0 +1,33 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block body %}
+<h4>{{ category }}:</h4>
+<br>
+<div class="row row-cols-1 row-cols-md-5 g-4">
+  {% for lot in object_list %}
+  <div class="col">
+    <div class="card">
+      <img
+        src="{% if lot.image %}{{ lot.image.url }}{% else %}{% static 'auctions/images/lot_default_pic.png' %}{% endif %}"
+        class="card-img-top" alt="Lot's picture">
+      <div class="card-body">
+        <h5 class="card-title">{{ lot.title }}</h5>
+        <p class="card-text">
+          {% if lot.description|length <= 100 %}{{ lot.description }}{% else %}{{ lot.description|slice:"100" }}...{% endif %}
+        </p>
+        <p class="card-text">
+          <strong>{{ lot.bid }}</strong>
+        </p>
+        <a href="{% url 'lot_detail' lot.pk %}" class="btn btn-primary ">More</a>
+      </div>
+      <div class="card-footer">
+        <small class="text-muted">Created {{ lot.add_date }}</small>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+
+{% endblock %}

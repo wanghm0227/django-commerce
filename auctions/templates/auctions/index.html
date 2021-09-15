@@ -5,7 +5,7 @@
 <div class="row row-cols-1 row-cols-md-5 g-4">
     {% for lot in listing %}
     <div class="col">
-        <div class="card">
+        <div class="card ">
             <img src="{% if lot.image %}{{ lot.image.url }}{% else %}{% static 'auctions/images/lot_default_pic.png' %}{% endif %}"
                 class="card-img-top" alt="Lot's picture">
             <div class="card-body">
@@ -16,7 +16,7 @@
                 <p class="card-text">
                     <strong>{{ lot.bid }}</strong>
                 </p>
-                <a href="{% url 'lot_detail' lot.pk %}" class="btn btn-primary">See Details</a>
+                <a href="{% url 'lot_detail' lot.pk %}" class="btn btn-primary ">More</a>
             </div>
             <div class="card-footer">
                 <small class="text-muted">Created {{ lot.add_date }}</small>
@@ -24,7 +24,5 @@
         </div>
     </div>
     {% endfor %}
-</div>
 
-
-{% endblock %}
+    {% endblock %}

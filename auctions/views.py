@@ -1,11 +1,16 @@
+
+from decimal import Decimal
+from django.contrib.messages.views import SuccessMessageMixin
 from auctions.forms import LotForm
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from .models import User, Lot
+from .models import User, Lot, Bid
 from django.views import generic
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.contrib import messages
 
 
 def index(request):
@@ -71,8 +76,14 @@ class LotDetailView(generic.DetailView):
     model = Lot
     template_name = 'auctions/lot_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        lot = self.object
+        context["highest_bid"] = lot.bids.order_by("-price").first()
+        return context
 
-class CreateListingView(generic.CreateView):
+
+class CreateListingView(CreateView):
     model = Lot
     form_class = LotForm
     template_name = 'auctions/create_listing.html'
@@ -81,38 +92,70 @@ class CreateListingView(generic.CreateView):
         lot = form.save(commit=False)
         lot.seller = User.objects.get(id=self.request.user.id)
         lot.save()
+        messages.success(
+            self.request, f'{lot.title} was created successfully!')
         return redirect('lot_detail', lot.pk)
 
-
-# def show_user_listings(request):
-#     user_id = request.user.pk
-#     lots = User.objects.get(pk=user_id).lots
-#     template = f'auctions/{user_id}/listings.html'
-#     render(request, template, {
-#         'lots': lots,
-#     })
 
 class UserListingsView(generic.ListView):
     template_name = 'auctions/user_listings.html'
 
     def get_queryset(self):
-        return User.objects.get(pk=self.request.user.pk).lots.all()
+        return User.objects.get(pk=self.kwargs['pk']).lots.all()
 
 
-class LotUpdateView(generic.UpdateView):
+class LotUpdateView(SuccessMessageMixin, UpdateView):
     model = Lot
     form_class = LotForm
     template_name = 'auctions/update_lot.html'
+    success_message = "Updated successfully!"
 
 
-class LotDeleteView(generic.DeleteView):
+class LotDeleteView(DeleteView):
     model = Lot
     form_class = LotForm
     template_name = 'auctions/delete_lot.html'
+    success_message = "Deleted successfully!"
+    permission_required = 'delete_lot'
 
     def get_success_url(self):
-        return reverse('user_listings', self.request.user.pk)
+        return reverse('user_listings', args=[self.request.user.pk])
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(LotDeleteView, self).delete(request, *args, **kwargs)
 
 
-def place_bid(request):
-    pass
+class CategoryListingsView(generic.ListView):
+    model = Lot
+    template_name = 'auctions/category_listings.html'
+
+    def get_queryset(self):
+        return Lot.objects.filter(category=self.kwargs['category'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["category"] = self.kwargs["category"]
+        return context
+
+
+def place_bid(request, lot_id):
+    lot = Lot.objects.get(pk=lot_id)
+    bids = lot.bids.all()
+    offer = Decimal(request.POST['offer'])
+    if bids:
+        highest_bid = bids.order_by('-price').first().price.amount
+    else:
+        highest_bid = lot.bid.amount
+    if offer <= highest_bid:
+        messages.warning(request, 'Invalid price!',
+                         extra_tags='alert alert-danger')
+    else:
+        new_bid = Bid(price=offer,
+                      lot=lot, bidder=request.user)
+        new_bid.save()
+        lot.bids.add(new_bid)
+        messages.success(request, 'Placed bid successfully!',
+                         extra_tags='alert alert-primary')
+
+    return redirect('lot_detail', pk=lot_id)
