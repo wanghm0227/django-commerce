@@ -1,0 +1,15 @@
+.form-group {
+    margin: 15px 0;
+}
+
+.lot-container {
+    padding: 25px 50px;
+}
+
+.lot-img {
+    max-width: 600px;
+}
+
+#id_bid_1 {
+    display: none;
+}

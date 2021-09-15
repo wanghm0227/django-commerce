@@ -1,0 +1,16 @@
+{% extends 'auctions/layout.html' %}
+{% load static %}
+
+{% block body %}
+{% if user.is_authenticated %}
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.media }}
+  {{ form.as_p }}
+  <input type="submit" value="Create Listing" class="btn btn-primary" />
+</form>
+{% else %}
+Sorry, you need to <a href="{% url 'login' %}">Log In</a>.
+{% endif %}
+
+{% endblock body %}

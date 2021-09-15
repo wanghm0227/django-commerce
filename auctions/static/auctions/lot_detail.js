@@ -1,0 +1,1 @@
+var current_bid = document.getElementById('current_bid')
