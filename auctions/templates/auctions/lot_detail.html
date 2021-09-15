@@ -17,15 +17,11 @@
   src="{% if lot.image %}{{ lot.image.url }}{% else %}{% static 'auctions/images/lot_default_pic.png' %}{% endif %}"
   alt="Lot's picture">
 <br><br>
-<p>{{ lot.description|safe }}</p>
-{% if user == lot.seller %}
+<p>{{ lot.description }}</p>
 <h5>Price:
-  {% if highest_bid %}
-  {{ highest_bid.price }}
-  {% else %}
   {{ lot.bid }}
-  {% endif %}
 </h5>
+{% if user == lot.seller %}
 {{ lot.bids.count }} bids so far.
 <br>
 <br>
@@ -33,20 +29,14 @@
 <a href="{% url 'delete_lot' lot.pk %}" class="btn btn-primary">Delete</a>
 {% else %}
 <hr>
-<h5>Price:
-  {% if highest_bid %}
-  {{ highest_bid.price }}
-  {% else %}
-  {{ lot.bid }}
-  {% endif %}
-</h5>
 <small>
   {{ lot.bids.count }} bids so far.
-  {% if highest_bid.bidder == request.user %}
+  {% if lot.bids.all.last.bidder == request.user %}
   Your bid is the current bid.
   {% endif %}
-
 </small>
+<br>
+
 <form action="{% url 'place_bid' lot.pk %}" method="post">
   {% csrf_token %}
   <div class="row g-3 align-items-center">

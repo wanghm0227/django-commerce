@@ -17,9 +17,9 @@ class Lot(models.Model):
     title = models.CharField(max_length=64)
     description = models.TextField()
     bid = MoneyField(max_digits=10, decimal_places=2,
-                     default_currency='USD', validators=[
-                         MinMoneyValidator(Decimal('0.01')),
-                     ])
+                             default_currency='USD', validators=[
+                                 MinMoneyValidator(Decimal('0.01')),
+                             ])
     image = models.ImageField(upload_to='lot_images/', null=True, blank=True)
     category = models.CharField(max_length=32, null=True, blank=True)
     add_date = models.DateTimeField(auto_now_add=True)
@@ -38,7 +38,6 @@ class Bid(models.Model):
                        ])
     lot = models.ForeignKey(Lot, on_delete=CASCADE, related_name="bids")
     bidder = models.ForeignKey(User, on_delete=CASCADE, related_name="bids")
-
 
     def __str__(self):
         return f'{self.price} - {self.lot} - {self.bidder}'

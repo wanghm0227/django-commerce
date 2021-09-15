@@ -76,12 +76,6 @@ class LotDetailView(generic.DetailView):
     model = Lot
     template_name = 'auctions/lot_detail.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        lot = self.object
-        context["highest_bid"] = lot.bids.order_by("-price").first()
-        return context
-
 
 class CreateListingView(CreateView):
     model = Lot
@@ -141,20 +135,18 @@ class CategoryListingsView(generic.ListView):
 
 def place_bid(request, lot_id):
     lot = Lot.objects.get(pk=lot_id)
-    bids = lot.bids.all()
+    current_bid = lot.bid.amount
     offer = Decimal(request.POST['offer'])
-    if bids:
-        highest_bid = bids.order_by('-price').first().price.amount
-    else:
-        highest_bid = lot.bid.amount
-    if offer <= highest_bid:
+
+    if offer <= current_bid:
         messages.warning(request, 'Invalid price!',
                          extra_tags='alert alert-danger')
     else:
         new_bid = Bid(price=offer,
                       lot=lot, bidder=request.user)
         new_bid.save()
-        lot.bids.add(new_bid)
+        lot.bid = new_bid.price
+        lot.save()
         messages.success(request, 'Placed bid successfully!',
                          extra_tags='alert alert-primary')
 
