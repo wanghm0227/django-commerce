@@ -3,15 +3,22 @@
 
 {% block body %}
 {% if messages %}
+
 <div class="messages">
   {% for message in messages %}
-  <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</div>
+  <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message|safe }}</div>
   {% endfor %}
 </div>
 {% endif %}
 <h4>{{ lot.title }}</h4>
 <small>Listed by: {{ lot.seller }}</small><br>
-<small>Category: <a href="{% url 'category_listings' lot.category %}">{{ lot.category }}</a></small><br>
+<small>Category:
+  {% if lot.category %}
+  <a href="{% url 'category_listings' lot.category %}">{{ lot.category }}</a></small>
+{% else %}
+Not set yet
+{% endif %}
+<br>
 <hr>
 <img class="lot-img"
   src="{% if lot.image %}{{ lot.image.url }}{% else %}{% static 'auctions/images/lot_default_pic.png' %}{% endif %}"
@@ -29,6 +36,15 @@
 <a href="{% url 'delete_lot' lot.pk %}" class="btn btn-primary">Delete</a>
 {% else %}
 <hr>
+<p>
+  {% if lot in user_watchlist  %}
+  <a href="{% url 'update_watchlist' lot.pk %}" class="btn btn-danger btn-sm">Remove from watchlist</a>
+  {% else %}
+  <a href="{% url 'update_watchlist' lot.pk %}" class="btn btn-primary  btn-sm">Add to watchlist</a>
+  {% endif %}
+</p>
+
+
 <small>
   {{ lot.bids.count }} bids so far.
   {% if lot.bids.all.last.bidder == request.user %}

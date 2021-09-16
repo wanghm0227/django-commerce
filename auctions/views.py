@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from .models import User, Lot, Bid
+from .models import User, Lot, Bid, Watchlist
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib import messages
@@ -62,6 +62,8 @@ def register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
+            user_watchlist = Watchlist(user=user)
+            user_watchlist.save()
         except IntegrityError:
             return render(request, "auctions/register.html", {
                 "message": "Username already taken."
@@ -75,6 +77,13 @@ def register(request):
 class LotDetailView(generic.DetailView):
     model = Lot
     template_name = 'auctions/lot_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        user_watchlist = Watchlist.objects.get(user=user)
+        context["user_watchlist"] = user_watchlist.lots.all()
+        return context
 
 
 class CreateListingView(CreateView):
@@ -150,4 +159,36 @@ def place_bid(request, lot_id):
         messages.success(request, 'Placed bid successfully!',
                          extra_tags='alert alert-primary')
 
+    return redirect('lot_detail', pk=lot_id)
+
+
+class UserWatchlistView(generic.ListView):
+    template_name = 'auctions/watchlist.html'
+
+    def get_queryset(self):
+        user = self.request.user
+        watchlist = Watchlist.objects.get(user=user)
+        lots = watchlist.lots.all()
+        return lots
+
+
+def update_watchlist(request, lot_id):
+    lot = Lot.objects.get(pk=lot_id)
+    url = reverse('watchlist', args=(request.user.id,))
+    watchlist = Watchlist.objects.get(user=request.user)
+    if lot in watchlist.lots.all():
+        # Remove the lot to watchlist
+        watchlist.lots.remove(lot)
+        if request.META['HTTP_REFERER'] == f'http://127.0.0.1:8000/{request.user.id}/watchlist/':
+            # If previous referer is 'watchlist', redirect to watchlist page.
+            messages.success(request, f"Removed successfully!",
+                             extra_tags='alert alert-primary')
+            return redirect('watchlist', pk=request.user.id)
+        messages.success(request, f"Removed successfully! <a href={url}>Go to see my watchlist</a>.",
+                         extra_tags='alert alert-primary')
+    else:
+        # Add the lot from watchlist
+        watchlist.lots.add(lot)
+        messages.success(request, f"Added successfully! <a href={url}>Go to see my watchlist</a>.",
+                         extra_tags='alert alert-primary')
     return redirect('lot_detail', pk=lot_id)

@@ -16,6 +16,9 @@ urlpatterns = [
     path("listings/<str:category>/",
          views.CategoryListingsView.as_view(), name="category_listings"),
     path("<int:lot_id>/place_bid/", views.place_bid, name="place_bid"),
+    path("<int:pk>/watchlist/", views.UserWatchlistView.as_view(), name="watchlist"),
+    path("listings/<int:lot_id>/update_watchlist/",
+         views.update_watchlist, name="update_watchlist"),
 ]
 
 if settings.DEBUG:

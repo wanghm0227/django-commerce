@@ -8,7 +8,7 @@
 {% endfor %}
 {% endif %}
 {% if not object_list %}
-Don't have a listing yet, <a href="{% url 'create_listing' %}">create one?</a>
+Don't have any lot yet, <a href="{% url 'index' %}">add one.</a>
 {% else %}
 <div class="row row-cols-1 row-cols-md-5 g-4">
   {% for lot in object_list %}
@@ -26,6 +26,9 @@ Don't have a listing yet, <a href="{% url 'create_listing' %}">create one?</a>
           <strong>{{ lot.bid }}</strong>
         </p>
         <a href="{% url 'lot_detail' lot.pk %}" class="btn btn-primary">More</a>
+        {% if request.user == user %}
+        <a href="{% url 'update_watchlist' lot.pk %}" class="btn btn-primary">Remove</a>
+        {% endif %}
       </div>
       <div class="card-footer">
         <small class="text-muted">Created {{ lot.add_date }}</small>
