@@ -19,6 +19,7 @@ urlpatterns = [
     path("<int:pk>/watchlist/", views.UserWatchlistView.as_view(), name="watchlist"),
     path("listings/<int:lot_id>/update_watchlist/",
          views.update_watchlist, name="update_watchlist"),
+    path("categories/", views.CategoriesView.as_view(), name="categories"),
 ]
 
 if settings.DEBUG:

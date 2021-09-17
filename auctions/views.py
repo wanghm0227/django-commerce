@@ -1,6 +1,8 @@
 
 from decimal import Decimal
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.list import ListView
 from auctions.forms import LotForm
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
@@ -11,6 +13,7 @@ from .models import User, Lot, Bid, Watchlist
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -81,8 +84,9 @@ class LotDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        user_watchlist = Watchlist.objects.get(user=user)
-        context["user_watchlist"] = user_watchlist.lots.all()
+        if user.is_authenticated:
+            user_watchlist = Watchlist.objects.get(user=user)
+            context["user_watchlist"] = user_watchlist.lots.all()
         return context
 
 
@@ -142,6 +146,7 @@ class CategoryListingsView(generic.ListView):
         return context
 
 
+@login_required()
 def place_bid(request, lot_id):
     lot = Lot.objects.get(pk=lot_id)
     current_bid = lot.bid.amount
@@ -162,7 +167,7 @@ def place_bid(request, lot_id):
     return redirect('lot_detail', pk=lot_id)
 
 
-class UserWatchlistView(generic.ListView):
+class UserWatchlistView(LoginRequiredMixin, generic.ListView):
     template_name = 'auctions/watchlist.html'
 
     def get_queryset(self):
@@ -172,6 +177,7 @@ class UserWatchlistView(generic.ListView):
         return lots
 
 
+@login_required()
 def update_watchlist(request, lot_id):
     lot = Lot.objects.get(pk=lot_id)
     url = reverse('watchlist', args=(request.user.id,))
@@ -192,3 +198,11 @@ def update_watchlist(request, lot_id):
         messages.success(request, f"Added successfully! <a href={url}>Go to see my watchlist</a>.",
                          extra_tags='alert alert-primary')
     return redirect('lot_detail', pk=lot_id)
+
+
+class CategoriesView(ListView):
+    template_name = 'auctions/categories.html'
+
+
+    def get_queryset(self):
+        return set([lot.category for lot in Lot.objects.all()])

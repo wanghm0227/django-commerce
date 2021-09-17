@@ -26,6 +26,14 @@
                         <a class="nav-link {% if url_name == 'index' %}active{% endif %}" aria-current="page"
                             href="{% url 'index' %}">Active Listings</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if url_name == 'categories' %}active{% endif %}" aria-current="page"
+                            href="{% url 'categories' %}">Categories</a>
+                    </li>
+                    {% comment %} <li class="nav-item">
+                        <a class="nav-link {% if url_name == 'index' %}active{% endif %}" aria-current="page"
+                            href="{% url 'index' %}">Closed Listings</a>
+                    </li> {% endcomment %}
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link {% if url_name == 'create_listing' %}active{% endif %}" aria-current="page"

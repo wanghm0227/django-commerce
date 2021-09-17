@@ -43,7 +43,7 @@ class Bid(models.Model):
 
 class Watchlist(models.Model):
     user = models.OneToOneField(User, on_delete=CASCADE)
-    lots = models.ManyToManyField(Lot, default=None, blank=True)
+    lots = models.ManyToManyField(Lot, blank=True)
 
     def __str__(self):
         return str(self.user)
