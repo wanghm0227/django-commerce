@@ -78,5 +78,24 @@ Not set yet
 {% endif %}
 
 {% endif %}
+<hr>
+<h5>Comments</h5>
+{% for comment in lot.comments.all %}
+<div class="w-auto p-3" style="background-color: #eee;">
+  <p><strong>{{ comment.commenter }}</strong> <br>
+    <small class="text-muted"> {{ comment.add_date }}</small></p>
+    <hr>
+  <p>{{ comment.content }}</p>
+</div>
+<br>
+{% endfor %}
+<form action="{% url 'comment' lot.pk %}" method="post">
+  {% csrf_token %}
+  <textarea name="content" rows="5" class="form-control"></textarea>
+  <br>
+  <input type="submit" value="Comment" class="btn btn-primary">
+</form>
+
+
 
 {% endblock body %}

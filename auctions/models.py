@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.fields.reverse_related import OneToOneRel
 from djmoney.models.fields import MoneyField
 from djmoney.models.validators import MinMoneyValidator
 
@@ -51,3 +52,15 @@ class Watchlist(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+
+class Comment(models.Model):
+    lot = models.ForeignKey(
+        Lot, on_delete=models.CASCADE, related_name="comments")
+    commenter = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="comments")
+    content = models.TextField(max_length=255)
+    add_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.lot) + ' - ' + str(self.commenter)

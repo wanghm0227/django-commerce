@@ -9,7 +9,7 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from .models import User, Lot, Bid, Watchlist
+from .models import User, Lot, Bid, Watchlist, Comment
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib import messages
@@ -225,3 +225,11 @@ def close_auction(request, lot_id):
         lot.save()
         return redirect('lot_detail', pk=lot_id)
     return render(request, 'auctions/close_auction.html', {'lot': lot, })
+
+
+def comment(request, lot_id):
+    lot = Lot.objects.get(pk=lot_id)
+    content = request.POST.get('content')
+    comment = Comment(commenter=request.user, lot=lot, content=content)
+    comment.save()
+    return redirect('lot_detail', pk=lot_id)

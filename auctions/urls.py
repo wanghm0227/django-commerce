@@ -23,6 +23,7 @@ urlpatterns = [
     path("categories/", views.CategoriesView.as_view(), name="categories"),
     path("<int:lot_id>/close/",
          views.close_auction, name="close_auction"),
+    path("<int:lot_id>/comment/", views.comment, name="comment"),
 ]
 
 if settings.DEBUG:
