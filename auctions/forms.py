@@ -10,7 +10,7 @@ class LotForm(forms.ModelForm):
         auto_id = False
 
         model = Lot
-        exclude = ['seller']
+        exclude = ['seller', 'active', 'buyer']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'bid': MoneyWidget(attrs={'class': 'form-control', 'placeholder': 'USD'}),

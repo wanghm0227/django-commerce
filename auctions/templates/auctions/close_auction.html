@@ -1,0 +1,12 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+<form action="{% url 'close_auction' lot.pk %}" method="POST">
+  {% csrf_token %}
+  <p> <strong>Are you sure you want to close "add a new lot"?</strong> </p>
+  <input type="submit" value="Confirm" class="btn btn-primary btn-sm">
+</form>
+
+{% endblock %}

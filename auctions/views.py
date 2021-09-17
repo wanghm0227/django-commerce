@@ -23,6 +23,13 @@ def index(request):
     })
 
 
+def active_listings(request):
+    listing = Lot.objects.filter(active=True)
+    return render(request, "auctions/index.html", {
+        'listing': listing,
+    })
+
+
 def login_view(request):
     if request.method == "POST":
 
@@ -108,7 +115,7 @@ class UserListingsView(generic.ListView):
     template_name = 'auctions/user_listings.html'
 
     def get_queryset(self):
-        return User.objects.get(pk=self.kwargs['pk']).lots.all()
+        return User.objects.get(pk=self.kwargs['pk']).auction_lots.all()
 
 
 class LotUpdateView(SuccessMessageMixin, UpdateView):
@@ -177,6 +184,13 @@ class UserWatchlistView(LoginRequiredMixin, generic.ListView):
         return lots
 
 
+class CategoriesView(ListView):
+    template_name = 'auctions/categories.html'
+
+    def get_queryset(self):
+        return set([lot.category for lot in Lot.objects.all()])
+
+
 @login_required()
 def update_watchlist(request, lot_id):
     lot = Lot.objects.get(pk=lot_id)
@@ -200,9 +214,14 @@ def update_watchlist(request, lot_id):
     return redirect('lot_detail', pk=lot_id)
 
 
-class CategoriesView(ListView):
-    template_name = 'auctions/categories.html'
-
-
-    def get_queryset(self):
-        return set([lot.category for lot in Lot.objects.all()])
+def close_auction(request, lot_id):
+    lot = Lot.objects.get(pk=lot_id)
+    if request.method == 'POST':
+        lot.active = False
+        bids = lot.bids.all()
+        if bids:
+            winner = bids.last().bidder
+            lot.buyer = winner
+        lot.save()
+        return redirect('lot_detail', pk=lot_id)
+    return render(request, 'auctions/close_auction.html', {'lot': lot, })

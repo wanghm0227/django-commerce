@@ -1,7 +1,6 @@
 from decimal import Decimal
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models.deletion import CASCADE
 from djmoney.models.fields import MoneyField
 from djmoney.models.validators import MinMoneyValidator
 
@@ -9,9 +8,13 @@ from djmoney.models.validators import MinMoneyValidator
 class User(AbstractUser):
     pass
 
+
 class Lot(models.Model):
     seller = models.ForeignKey(
-        User, on_delete=CASCADE, related_name="lots")
+        User, on_delete=models.CASCADE, related_name="auction_lots")
+    buyer = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="purchased_lot", null=True)
+    active = models.BooleanField(default=True)
     title = models.CharField(max_length=64)
     description = models.TextField()
     bid = MoneyField(max_digits=10, decimal_places=2,
@@ -34,15 +37,16 @@ class Bid(models.Model):
                        default_currency='USD', validators=[
                            MinMoneyValidator(Decimal('0.01')),
                        ])
-    lot = models.ForeignKey(Lot, on_delete=CASCADE, related_name="bids")
-    bidder = models.ForeignKey(User, on_delete=CASCADE, related_name="bids")
+    lot = models.ForeignKey(Lot, on_delete=models.CASCADE, related_name="bids")
+    bidder = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="bids")
 
     def __str__(self):
         return f'{self.price} - {self.lot} - {self.bidder}'
 
 
 class Watchlist(models.Model):
-    user = models.OneToOneField(User, on_delete=CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     lots = models.ManyToManyField(Lot, blank=True)
 
     def __str__(self):

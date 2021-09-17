@@ -23,17 +23,13 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     {% with url_name=request.resolver_match.url_name %}
                     <li class="nav-item">
-                        <a class="nav-link {% if url_name == 'index' %}active{% endif %}" aria-current="page"
-                            href="{% url 'index' %}">Active Listings</a>
+                        <a class="nav-link {% if url_name == 'active_listings' %}active{% endif %}" aria-current="page"
+                            href="{% url 'active_listings' %}">Active Listings</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if url_name == 'categories' %}active{% endif %}" aria-current="page"
                             href="{% url 'categories' %}">Categories</a>
                     </li>
-                    {% comment %} <li class="nav-item">
-                        <a class="nav-link {% if url_name == 'index' %}active{% endif %}" aria-current="page"
-                            href="{% url 'index' %}">Closed Listings</a>
-                    </li> {% endcomment %}
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link {% if url_name == 'create_listing' %}active{% endif %}" aria-current="page"
@@ -46,7 +42,7 @@
                     <li class="nav-item">
                         <a class="nav-link {% if url_name == 'watchlist' %}active{% endif %}" aria-current="page"
                             href="{% url 'watchlist' user.pk %}">Watchlist</a>
-                    </li> 
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">

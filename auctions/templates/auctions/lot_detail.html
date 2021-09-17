@@ -2,8 +2,14 @@
 {% load static %}
 
 {% block body %}
+{% if not lot.active %}
+<p class="border border-primary rounded p-3 mb-2 bg-primary text-white"> The auctioin is closed.
+  {% if lot.buyer == user %}
+  You are the buyer.
+  {% endif %}
+</p>
+{% endif %}
 {% if messages %}
-
 <div class="messages">
   {% for message in messages %}
   <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message|safe }}</div>
@@ -33,10 +39,14 @@ Not set yet
 {{ lot.bids.count }} bids so far.
 <br>
 <br>
+{% if lot.active %}
 <a href="{% url 'update_lot' lot.pk %}" class="btn btn-primary">Modify</a>
 <a href="{% url 'delete_lot' lot.pk %}" class="btn btn-primary">Delete</a>
+<a href="{% url 'close_auction' lot.pk %}" class="btn btn-danger">Close</a>
 {% else %}
-<hr>
+<a href="{% url 'delete_lot' lot.pk %}" class="btn btn-primary">Delete</a>
+{% endif %}
+{% else %}
 <p>
   {% if lot in user_watchlist  %}
   <a href="{% url 'update_watchlist' lot.pk %}" class="btn btn-danger btn-sm">Remove from watchlist</a>
@@ -53,7 +63,7 @@ Not set yet
   {% endif %}
 </small>
 <br>
-
+{% if lot.active %}
 <form action="{% url 'place_bid' lot.pk %}" method="post">
   {% csrf_token %}
   <div class="row g-3 align-items-center">
@@ -65,6 +75,8 @@ Not set yet
     </div>
   </div>
 </form>
+{% endif %}
+
 {% endif %}
 
 {% endblock body %}

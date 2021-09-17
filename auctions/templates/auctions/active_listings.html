@@ -9,11 +9,7 @@
             <img src="{% if lot.image %}{{ lot.image.url }}{% else %}{% static 'auctions/images/lot_default_pic.png' %}{% endif %}"
                 class="card-img-top" alt="Lot's picture">
             <div class="card-body">
-                <h5 class="card-title">{{ lot.title }}
-                {% if not lot.active %}
-                <span class="badge bg-secondary">Closed</span>
-                {% endif %}
-                </h5>
+                <h5 class="card-title">{{ lot.title }}</h5>
                 <p class="card-text">
                     {% if lot.description|length <= 100 %}{{ lot.description }}{% else %}{{ lot.description|slice:"100" }}...{% endif %}
                 </p>
