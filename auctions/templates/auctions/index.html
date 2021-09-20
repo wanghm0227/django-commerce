@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block body %}
-<div class="row row-cols-1 row-cols-md-5 g-4">
+<div class="row row-cols-lg-5 row-cols-md-3 row-cols-sm-2 g-4" data-masonry='{"percentPosition": true }'>
     {% for lot in listing %}
     <div class="col">
         <div class="card ">
@@ -10,9 +10,9 @@
                 class="card-img-top" alt="Lot's picture">
             <div class="card-body">
                 <h5 class="card-title">{{ lot.title }}
-                {% if not lot.active %}
-                <span class="badge bg-secondary">Closed</span>
-                {% endif %}
+                    {% if not lot.active %}
+                    <span class="badge bg-secondary">Closed</span>
+                    {% endif %}
                 </h5>
                 <p class="card-text">
                     {% if lot.description|length <= 100 %}{{ lot.description }}{% else %}{{ lot.description|slice:"100" }}...{% endif %}
@@ -22,7 +22,10 @@
                         {{ lot.bid }}
                     </strong>
                 </p>
-                <a href="{% url 'lot_detail' lot.pk %}" class="btn btn-primary ">More</a>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'lot_detail' lot.pk %}" class="btn btn-primary ">More</a>
+                </div>
+
             </div>
             <div class="card-footer">
                 <small class="text-muted">Created {{ lot.add_date }}</small>
